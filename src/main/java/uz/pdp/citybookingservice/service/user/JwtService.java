@@ -3,8 +3,9 @@ package uz.pdp.citybookingservice.service.user;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import org.jvnet.hk2.annotations.Service;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 @Service
 public class JwtService {
