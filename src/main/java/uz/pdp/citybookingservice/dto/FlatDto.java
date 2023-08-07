@@ -1,8 +1,11 @@
 package uz.pdp.citybookingservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import lombok.*;
-import uz.pdp.citybookingservice.entity.FlatStatus;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -10,9 +13,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class FlatDto {
-    private UUID flatId;
+    private UUID id;
     private UUID ownerId;
-    private Integer days;
-    private Double pricePerNight;
+    private Double pricePerMonth;
+    private LocalDateTime createdTime;
+
 }
