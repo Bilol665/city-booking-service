@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
+import uz.pdp.citybookingservice.dto.JwtToken;
+import uz.pdp.citybookingservice.repository.JwtTokenRepository;
 import uz.pdp.citybookingservice.service.user.AuthenticationService;
 import uz.pdp.citybookingservice.service.user.JwtService;
 
@@ -16,8 +18,11 @@ import java.io.IOException;
 
 @AllArgsConstructor
 public class JwtFilterToken extends OncePerRequestFilter {
+    private final JwtTokenRepository jwtTokenRepository;
     private final JwtService jwtService;
     private final AuthenticationService authenticationService;
+
+
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -32,6 +37,7 @@ public class JwtFilterToken extends OncePerRequestFilter {
         token = token.substring(7);
         Jws<Claims> claimsJws = jwtService.extractToken(token);
         authenticationService.Authenticate(claimsJws.getBody(),request);
+        jwtTokenRepository.save(new JwtToken(claimsJws.getBody().getSubject(),token));
 
         filterChain.doFilter(request,response);
     }
