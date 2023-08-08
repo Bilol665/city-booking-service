@@ -2,7 +2,6 @@ package uz.pdp.citybookingservice.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import uz.pdp.citybookingservice.dto.FlatDto;
 import uz.pdp.citybookingservice.dto.UserDto;
@@ -56,19 +55,25 @@ public class BookingService {
     }
 
     public BookingEntity bookSingleFlat(UUID flatId, Principal principal) {
-        UserDto userDetails = (UserDto) authService.loadUserByUsername(principal.getName());
-        FlatDto flatByID = authService.getFlatByID(flatId);
-        return BookingEntity.builder()
-                .bookingNumber((long) (getMax()+1))
-                .ownerId(userDetails.getId())
+        UserDto user = authService.getUserByUsername(principal.getName());
+        FlatDto flatByID = authService.getFlatByID(flatId, principal.getName());
+        BookingEntity build = BookingEntity.builder()
+                .bookingNumber((long) (getMax() + 1))
+                .ownerId(user.getId())
                 .type(BookingType.FLAT)
                 .orderId(flatId)
                 .endTime(LocalDateTime.now().plusMonths(1))
                 .totalPrice(flatByID.getPricePerMonth())
                 .build();
+        authService.setOwner(flatId,principal.getName());
+        return bookingRepository.save(build);
     }
     private int getMax() {
-        return bookingRepository.getMax();
+        try {
+            return bookingRepository.getMax();
+        }catch (Exception e) {
+            return 0;
+        }
     }
 }
 

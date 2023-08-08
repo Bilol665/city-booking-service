@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import uz.pdp.citybookingservice.filter.JwtFilterToken;
+import uz.pdp.citybookingservice.repository.JwtTokenRepository;
 import uz.pdp.citybookingservice.service.user.AuthService;
 import uz.pdp.citybookingservice.service.user.AuthenticationService;
 import uz.pdp.citybookingservice.service.user.JwtService;
@@ -26,6 +27,7 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationService authenticationService;
     private final JwtService jwtService;
+    private final JwtTokenRepository jwtTokenRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -35,7 +37,7 @@ public class SecurityConfig {
                 .requestMatchers("/booking/**").permitAll()
                 .and()
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JwtFilterToken(jwtService, authenticationService),
+                .addFilterBefore(new JwtFilterToken(jwtTokenRepository,jwtService,authenticationService),
                         UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
