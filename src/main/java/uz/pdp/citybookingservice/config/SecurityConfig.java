@@ -14,7 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import uz.pdp.citybookingservice.filter.JwtFilterToken;
 import uz.pdp.citybookingservice.repository.JwtTokenRepository;
-import uz.pdp.citybookingservice.service.user.AuthService;
+import uz.pdp.citybookingservice.service.connection.AuthService;
 import uz.pdp.citybookingservice.service.user.AuthenticationService;
 import uz.pdp.citybookingservice.service.user.JwtService;
 
