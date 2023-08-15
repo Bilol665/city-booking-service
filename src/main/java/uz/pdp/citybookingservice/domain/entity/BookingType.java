@@ -1,4 +1,4 @@
-package uz.pdp.citybookingservice.entity;
+package uz.pdp.citybookingservice.domain.entity;
 
 public enum BookingType {
     DOCTOR,FLAT,PRODUCT

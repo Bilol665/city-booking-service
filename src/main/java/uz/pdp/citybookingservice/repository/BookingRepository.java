@@ -3,7 +3,7 @@ package uz.pdp.citybookingservice.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import uz.pdp.citybookingservice.entity.BookingEntity;
+import uz.pdp.citybookingservice.domain.entity.BookingEntity;
 
 import java.util.UUID;
 @Repository

@@ -9,12 +9,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
-import uz.pdp.citybookingservice.dto.JwtToken;
+import uz.pdp.citybookingservice.domain.dto.JwtToken;
+import uz.pdp.citybookingservice.exception.NotAcceptable;
 import uz.pdp.citybookingservice.repository.JwtTokenRepository;
 import uz.pdp.citybookingservice.service.user.AuthenticationService;
 import uz.pdp.citybookingservice.service.user.JwtService;
 
 import java.io.IOException;
+import java.util.Date;
 
 @AllArgsConstructor
 public class JwtFilterToken extends OncePerRequestFilter {
@@ -38,6 +40,8 @@ public class JwtFilterToken extends OncePerRequestFilter {
         Jws<Claims> claimsJws = jwtService.extractToken(token);
         authenticationService.Authenticate(claimsJws.getBody(),request);
         jwtTokenRepository.save(new JwtToken(claimsJws.getBody().getSubject(),token));
+        Date expiration = claimsJws.getBody().getExpiration();
+        if(new Date().before(expiration)) throw new NotAcceptable("Expired access token!");
 
         filterChain.doFilter(request,response);
     }

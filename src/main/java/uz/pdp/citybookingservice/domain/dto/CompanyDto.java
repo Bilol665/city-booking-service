@@ -1,4 +1,4 @@
-package uz.pdp.citybookingservice.dto;
+package uz.pdp.citybookingservice.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

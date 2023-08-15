@@ -1,4 +1,4 @@
-package uz.pdp.citybookingservice.dto;
+package uz.pdp.citybookingservice.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotBlank;

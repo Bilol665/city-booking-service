@@ -1,38 +1,53 @@
 package uz.pdp.citybookingservice.service.connection;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import uz.pdp.citybookingservice.exception.DataNotFoundException;
-import uz.pdp.citybookingservice.repository.JwtTokenRepository;
+import uz.pdp.citybookingservice.domain.dto.CardReadDto;
+import uz.pdp.citybookingservice.domain.dto.PaymentDto;
 
+import java.security.Principal;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
     private final RestTemplate restTemplate;
-    private final JwtTokenRepository jwtTokenRepository;
+    private final BaseService baseService;
+    private final ApartmentService apartmentService;
     @Value("${services.payment-url}")
     private String paymentUrl;
 
-    public void pay(String sender,UUID receiverId,Double amount) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(paymentUrl + "/api/v1/card/transact")
-                .queryParam("receiver",receiverId)
-                .queryParam("balance",amount);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        String token = jwtTokenRepository.findById(sender).orElseThrow(() -> new DataNotFoundException("Jwt not found!")).getToken();
-        httpHeaders.add("authorization","Bearer " + token);
-        HttpEntity<String> entity = new HttpEntity<>(httpHeaders);
-        restTemplate.exchange(builder.toUriString(), HttpMethod.PUT,entity, JsonNode.class);
+    public void pay(String senderCardNumber,UUID receiverFlatId,Double amount,Principal principal) {
+        UUID receiverCardId = apartmentService.getByFlatId(receiverFlatId, principal.getName());
+        String receiverCard = getByCardId(receiverCardId,principal);
+        PaymentDto paymentDto = PaymentDto.builder()
+                .sender(senderCardNumber)
+                .receiver(receiverCard)
+                .cash(amount)
+                .build();
 
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(paymentUrl + "/api/v1/p2p");
+        HttpHeaders httpHeaders = baseService.configureHttpHeaders(principal.getName());
+        HttpEntity<PaymentDto> entity = new HttpEntity<>(paymentDto,httpHeaders);
+        restTemplate.exchange(builder.toUriString(), HttpMethod.PUT,entity, CardReadDto.class);
     }
+    public UUID getByCard(String cardNumber, Principal principal) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(paymentUrl + "/api/v1/card/get-b-user/" + cardNumber);
+        HttpHeaders httpHeaders = baseService.configureHttpHeaders(principal.getName());
+        HttpEntity<UUID> entity = new HttpEntity<>(httpHeaders);
+        return restTemplate.exchange(builder.toUriString(), HttpMethod.GET,entity,UUID.class).getBody();
+    }
+    public String getByCardId(UUID cardId,Principal principal) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(paymentUrl + "/api/v1/card/get/" + cardId);
+        HttpHeaders httpHeaders = baseService.configureHttpHeaders(principal.getName());
+        HttpEntity<UUID> entity = new HttpEntity<>(httpHeaders);
+        return restTemplate.exchange(builder.toUriString(), HttpMethod.GET,entity,String.class).getBody();
+    }
+
 }

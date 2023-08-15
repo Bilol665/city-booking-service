@@ -1,4 +1,4 @@
-package uz.pdp.citybookingservice.entity;
+package uz.pdp.citybookingservice.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,8 +15,11 @@ import java.util.UUID;
 public class BookingEntity extends BaseEntity {
     private UUID ownerId;
     private UUID orderId;
+    @Enumerated(EnumType.STRING)
     private BookingType type;
     private Double totalPrice;
     private Long bookingNumber;
     private LocalDateTime endTime;
+    @Enumerated(EnumType.STRING)
+    private BookingStatus status;
 }

@@ -3,11 +3,9 @@ package uz.pdp.citybookingservice.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uz.pdp.citybookingservice.dto.CompanyDto;
-import uz.pdp.citybookingservice.dto.FlatDto;
-import uz.pdp.citybookingservice.dto.UserDto;
-import uz.pdp.citybookingservice.entity.BookingEntity;
-import uz.pdp.citybookingservice.entity.BookingType;
+import uz.pdp.citybookingservice.domain.dto.FlatDto;
+import uz.pdp.citybookingservice.domain.entity.BookingEntity;
+import uz.pdp.citybookingservice.domain.entity.BookingType;
 import uz.pdp.citybookingservice.exception.DataNotFoundException;
 import uz.pdp.citybookingservice.repository.BookingRepository;
 import uz.pdp.citybookingservice.service.connection.ApartmentService;
@@ -23,7 +21,6 @@ import java.util.UUID;
 @Transactional
 public class BookingService {
     private final BookingRepository bookingRepository;
-    private final AuthService authService;
     private final ApartmentService apartmentService;
     private final PaymentService paymentService;
     public void cancelBooking(UUID orderId){
@@ -32,19 +29,18 @@ public class BookingService {
         bookingRepository.delete(thereIsNoSuchOrders);
     }
 
-    public BookingEntity bookSingleFlat(UUID flatId, Principal principal) {
-        UserDto user = authService.getUserByUsername(principal.getName());
-        FlatDto flatByID = apartmentService.getFlatByID(flatId, principal.getName());
+    public BookingEntity bookSingleFlat(UUID flatId, String senderCardNumber, Principal principal) {
+        UUID userId = paymentService.getByCard(senderCardNumber, principal);
+        FlatDto flat = apartmentService.getFlatByID(flatId, principal.getName());
         BookingEntity build = BookingEntity.builder()
                 .bookingNumber((long) (getMax() + 1))
-                .ownerId(user.getId())
+                .ownerId(userId)
                 .type(BookingType.FLAT)
                 .orderId(flatId)
                 .endTime(LocalDateTime.now().plusMonths(1))
-                .totalPrice(flatByID.getPricePerMonth())
+                .totalPrice(flat.getPricePerMonth())
                 .build();
-        CompanyDto company = apartmentService.getCompany(flatByID.getOwnerId(), principal.getName());
-        paymentService.pay(user.getEmail(),company.getOwnerId(), flatByID.getPricePerMonth());
+        paymentService.pay(senderCardNumber,flat.getId(), flat.getPricePerMonth(),principal);
         apartmentService.setOwner(flatId,principal.getName());
         return bookingRepository.save(build);
     }
