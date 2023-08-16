@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uz.pdp.citybookingservice.dto.FlatDto;
-import uz.pdp.citybookingservice.entity.BookingEntity;
+import uz.pdp.citybookingservice.domain.entity.BookingEntity;
 import uz.pdp.citybookingservice.service.BookingService;
 
 
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RestController
@@ -30,9 +28,10 @@ public class BookingController {
     @PutMapping("/book/flat/{flatId}")
     public ResponseEntity<BookingEntity> bookFlat(
             Principal principal,
+            @RequestParam String cardNumber,
             @PathVariable UUID flatId) {
 
-        return ResponseEntity.ok(bookingService.bookSingleFlat(flatId,principal));
+        return ResponseEntity.ok(bookingService.bookSingleFlat(flatId,cardNumber,principal));
     }
 
 }

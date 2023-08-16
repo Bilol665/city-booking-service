@@ -1,9 +1,7 @@
-package uz.pdp.citybookingservice.dto;
+package uz.pdp.citybookingservice.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,5 +17,6 @@ public class FlatDto {
     private UUID ownerId;
     private Double pricePerMonth;
     private LocalDateTime createdTime;
+    private UUID cardId;
 
 }

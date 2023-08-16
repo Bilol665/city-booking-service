@@ -1,4 +1,4 @@
-package uz.pdp.citybookingservice.dto;
+package uz.pdp.citybookingservice.domain.dto;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
