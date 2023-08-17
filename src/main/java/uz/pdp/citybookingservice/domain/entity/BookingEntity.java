@@ -14,6 +14,7 @@ import java.util.UUID;
 @Builder
 public class BookingEntity extends BaseEntity {
     private UUID ownerId;
+    private UUID fromWhomId;
     private UUID orderId;
     @Enumerated(EnumType.STRING)
     private BookingType type;
