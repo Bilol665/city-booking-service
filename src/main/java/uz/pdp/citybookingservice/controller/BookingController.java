@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uz.pdp.citybookingservice.domain.entity.BookingEntity;
-import uz.pdp.citybookingservice.service.BookingService;
+import uz.pdp.citybookingservice.domain.dto.ApiResponse;
+import uz.pdp.citybookingservice.service.booking.BookingService;
 
 
 import java.security.Principal;
@@ -18,20 +18,45 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PutMapping("/removeOrder{id}")
-    public ResponseEntity<HttpStatus> bookFlat(
+    public ResponseEntity<ApiResponse> bookFlat(
             @PathVariable UUID id
     ) {
         bookingService.cancelBooking(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK,true,"Successfully deleted"));
     }
 
     @PutMapping("/book/flat/{flatId}")
-    public ResponseEntity<BookingEntity> bookFlat(
+    public ResponseEntity<ApiResponse> bookFlat(
             Principal principal,
-            @RequestParam String cardNumber,
             @PathVariable UUID flatId) {
 
-        return ResponseEntity.ok(bookingService.bookSingleFlat(flatId,cardNumber,principal));
+        return ResponseEntity.ok(new ApiResponse(
+                HttpStatus.OK,
+                true,
+                "Successfully booked",
+                bookingService.bookSingleFlat(flatId,principal)));
     }
-
+    @PutMapping("/confirm/{bookingId}")
+    public ResponseEntity<ApiResponse> confirm1(
+            Principal principal,
+            @PathVariable UUID bookingId
+    ) {
+        bookingService.confirm1(principal,bookingId);
+        return ResponseEntity.ok(new ApiResponse(
+                HttpStatus.OK,
+                true,
+                "Successfully booked"));
+    }
+    @PutMapping("/approve/{bookingId}")
+    public ResponseEntity<ApiResponse> approve(
+            Principal principal,
+            @RequestParam String cardNumber,
+            @PathVariable UUID bookingId
+    ) {
+        bookingService.approve(principal,cardNumber,bookingId);
+        return ResponseEntity.ok(new ApiResponse(
+                HttpStatus.OK,
+                true,
+                "Successfully booked"));
+    }
 }

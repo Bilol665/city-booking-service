@@ -13,6 +13,7 @@ import java.util.UUID;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FlatDto {
+    private Integer number;
     private UUID id;
     private UUID ownerId;
     private Double pricePerMonth;

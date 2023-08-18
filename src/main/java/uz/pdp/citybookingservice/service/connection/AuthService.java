@@ -19,6 +19,7 @@ import uz.pdp.citybookingservice.exception.DataNotFoundException;
 import uz.pdp.citybookingservice.repository.JwtTokenRepository;
 
 import java.security.Principal;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -44,9 +45,19 @@ public class AuthService implements UserDetailsService {
     private UserDto getUserDto(Principal principal, UriComponentsBuilder builder) {
         JwtToken jwtTokenEntity = jwtTokenRepository.findById(principal.getName()).orElseThrow(() -> new DataNotFoundException("Jwt token not found or expired!"));
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("authorization",jwtTokenEntity.getToken());
+        httpHeaders.add("authorization","Bearer " + jwtTokenEntity.getToken());
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(httpHeaders);
+        return restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, UserDto.class).getBody();
+    }
+    public UserDto getById(UUID userId,Principal principal) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(userUrl + "/api/v1/get/id")
+                .queryParam("id",userId);
+        JwtToken jwtTokenEntity = jwtTokenRepository.findById(principal.getName()).orElseThrow(() -> new DataNotFoundException("Jwt token not found or expired!"));
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("authorization","Bearer " + jwtTokenEntity.getToken());
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<UUID> entity = new HttpEntity<>(httpHeaders);
         return restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, UserDto.class).getBody();
     }
 

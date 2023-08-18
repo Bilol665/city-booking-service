@@ -24,7 +24,7 @@ public class PaymentService {
     private String paymentUrl;
 
     public void pay(String senderCardNumber,UUID receiverFlatId,Double amount,Principal principal) {
-        UUID receiverCardId = apartmentService.getByFlatId(receiverFlatId, principal.getName());
+        UUID receiverCardId = apartmentService.getCardIdByFlatId(receiverFlatId, principal.getName());
         String receiverCard = getByCardId(receiverCardId,principal);
         PaymentDto paymentDto = PaymentDto.builder()
                 .sender(senderCardNumber)
@@ -35,13 +35,7 @@ public class PaymentService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(paymentUrl + "/api/v1/p2p");
         HttpHeaders httpHeaders = baseService.configureHttpHeaders(principal.getName());
         HttpEntity<PaymentDto> entity = new HttpEntity<>(paymentDto,httpHeaders);
-        restTemplate.exchange(builder.toUriString(), HttpMethod.PUT,entity, CardReadDto.class);
-    }
-    public UUID getByCard(String cardNumber, Principal principal) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(paymentUrl + "/api/v1/card/get-b-user/" + cardNumber);
-        HttpHeaders httpHeaders = baseService.configureHttpHeaders(principal.getName());
-        HttpEntity<UUID> entity = new HttpEntity<>(httpHeaders);
-        return restTemplate.exchange(builder.toUriString(), HttpMethod.GET,entity,UUID.class).getBody();
+        restTemplate.exchange(builder.toUriString(), HttpMethod.POST,entity, CardReadDto.class);
     }
     public String getByCardId(UUID cardId,Principal principal) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(paymentUrl + "/api/v1/card/get/" + cardId);
