@@ -17,7 +17,7 @@ import java.util.UUID;
 public class BookingController {
     private final BookingService bookingService;
 
-    @PutMapping("/removeOrder{id}")
+    @DeleteMapping("/removeOrder/{id}")
     public ResponseEntity<ApiResponse> bookFlat(
             @PathVariable UUID id
     ) {
